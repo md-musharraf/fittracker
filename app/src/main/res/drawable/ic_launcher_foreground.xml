@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Glowing Calorie Progress Ring Arc (270 degrees) -->
+    <path
+        android:pathData="M 54,24 A 30,30 0 1,1 24,54"
+        android:strokeColor="#F97316"
+        android:strokeWidth="5"
+        android:strokeLineCap="round" />
+
+    <!-- Accent Goal Dot (Green) -->
+    <path
+        android:pathData="M 54,24 A 1,1 0 1,0 54,24.1"
+        android:strokeColor="#22C55E"
+        android:strokeWidth="7"
+        android:strokeLineCap="round" />
+
+    <!-- Calorie Burn Flame (Outer Layer) -->
+    <path
+        android:fillColor="#EA580C"
+        android:pathData="M 54,34 C 64,43 67,52 65,61 C 63,70 56,75 54,76 C 52,75 45,70 43,61 C 41,52 44,43 54,34 Z" />
+
+    <!-- Calorie Burn Flame (Mid Glow) -->
+    <path
+        android:fillColor="#F97316"
+        android:pathData="M 53,39 C 61,46 64,54 62,61 C 60,68 55,72 53,73 C 51,72 46,68 44,61 C 42,54 45,46 53,39 Z" />
+
+    <!-- Calorie Burn Flame (Inner Core) -->
+    <path
+        android:fillColor="#FDE047"
+        android:pathData="M 54,49 C 58,54 60,58 59,62 C 58,66 56,69 54,70 C 52,69 50,66 49,62 C 48,58 50,54 54,49 Z" />
+
+    <!-- Dumbbell Strength Bar Base -->
+    <path
+        android:pathData="M 42,81 L 66,81"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="3.5"
+        android:strokeLineCap="round" />
+
+    <!-- Dumbbell Left Weight -->
+    <path
+        android:pathData="M 40,77 L 40,85"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="4"
+        android:strokeLineCap="round" />
+
+    <!-- Dumbbell Right Weight -->
+    <path
+        android:pathData="M 68,77 L 68,85"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="4"
+        android:strokeLineCap="round" />
+
+</vector>
