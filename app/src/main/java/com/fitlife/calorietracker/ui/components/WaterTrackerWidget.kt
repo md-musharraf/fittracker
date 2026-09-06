@@ -10,14 +10,16 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.WaterDrop
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Remove
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.material.icons.filled.Remove
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.runtime.*
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.fitlife.calorietracker.ui.theme.WaterColor
@@ -37,6 +39,61 @@ fun WaterTrackerWidget(
         animationSpec = tween(durationMillis = 600),
         label = "WaterProgress"
     )
+
+    var showCustomWaterDialog by remember { mutableStateOf(false) }
+
+    if (showCustomWaterDialog) {
+        var customAmountText by remember { mutableStateOf("") }
+        AlertDialog(
+            onDismissRequest = { showCustomWaterDialog = false },
+            icon = { Icon(Icons.Default.WaterDrop, contentDescription = null, tint = WaterColor) },
+            title = { Text("Log Custom Water") },
+            text = {
+                Column {
+                    Text("Enter amount drank in milliliters (ml):", style = MaterialTheme.typography.bodySmall)
+                    Spacer(modifier = Modifier.height(8.dp))
+                    OutlinedTextField(
+                        value = customAmountText,
+                        onValueChange = { customAmountText = it },
+                        placeholder = { Text("e.g. 350") },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                    ) {
+                        listOf(150, 350, 500, 1000).forEach { preset ->
+                            AssistChip(
+                                onClick = { customAmountText = preset.toString() },
+                                label = { Text("${preset}ml", fontSize = 10.sp, maxLines = 1, softWrap = false) }
+                            )
+                        }
+                    }
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        val parsed = customAmountText.toIntOrNull()
+                        if (parsed != null && parsed > 0) {
+                            onAddWater(parsed.coerceIn(10, 5000))
+                        }
+                        showCustomWaterDialog = false
+                    }
+                ) {
+                    Text("Add")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showCustomWaterDialog = false }) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
 
     Card(
         shape = RoundedCornerShape(16.dp),
@@ -91,21 +148,25 @@ fun WaterTrackerWidget(
             Spacer(modifier = Modifier.height(14.dp))
 
             // Progress Bar
+            val surfaceVariant = MaterialTheme.colorScheme.surfaceVariant
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(10.dp)
                     .clip(RoundedCornerShape(6.dp))
-                    .background(MaterialTheme.colorScheme.surfaceVariant)
-            ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth(animatedProgress)
-                        .fillMaxHeight()
-                        .clip(RoundedCornerShape(6.dp))
-                        .background(WaterColor)
-                )
-            }
+                    .drawBehind {
+                        drawRect(color = surfaceVariant)
+                        if (animatedProgress > 0f) {
+                            drawRect(
+                                color = WaterColor,
+                                size = androidx.compose.ui.geometry.Size(
+                                    width = size.width * animatedProgress,
+                                    height = size.height
+                                )
+                            )
+                        }
+                    }
+            )
 
             Spacer(modifier = Modifier.height(14.dp))
 
@@ -151,14 +212,14 @@ fun WaterTrackerWidget(
                 }
 
                 OutlinedButton(
-                    onClick = { onAddWater(750) },
+                    onClick = { showCustomWaterDialog = true },
                     shape = RoundedCornerShape(10.dp),
-                    contentPadding = PaddingValues(horizontal = 6.dp, vertical = 6.dp),
+                    contentPadding = PaddingValues(horizontal = 4.dp, vertical = 6.dp),
                     modifier = Modifier.weight(1f)
                 ) {
-                    Icon(imageVector = Icons.Default.Add, contentDescription = null, modifier = Modifier.size(13.dp))
+                    Icon(imageVector = Icons.Default.Edit, contentDescription = null, modifier = Modifier.size(12.dp))
                     Spacer(modifier = Modifier.width(2.dp))
-                    Text(text = "+750ml", fontSize = 11.sp)
+                    Text(text = "Custom", fontSize = 11.sp)
                 }
             }
         }

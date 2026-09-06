@@ -65,7 +65,7 @@ fun ProgressScreen(
             contentPadding = PaddingValues(top = 8.dp, bottom = 90.dp)
         ) {
             // Goal Overview Header Card
-            item {
+            item(key = "weight_goal_card", contentType = "weight_goal_card") {
                 Card(
                     shape = RoundedCornerShape(18.dp),
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
@@ -145,12 +145,12 @@ fun ProgressScreen(
             }
 
             // Weekly Calorie Bar Chart
-            item {
+            item(key = "weekly_chart", contentType = "weekly_chart") {
                 SimpleWeeklyBarChart(weeklyData = uiState.weeklyChartData)
             }
 
             // Consistency & Habit Summary
-            item {
+            item(key = "habit_summary", contentType = "habit_summary") {
                 Card(
                     shape = RoundedCornerShape(16.dp),
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
@@ -253,7 +253,7 @@ fun ProgressScreen(
             }
 
             // Weight History Header
-            item {
+            item(key = "weight_history_header", contentType = "section_header") {
                 Text(
                     text = "Body Weight Check-in History",
                     style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
@@ -263,7 +263,7 @@ fun ProgressScreen(
 
             // Weight Logs List
             if (uiState.weightLogs.isEmpty()) {
-                item {
+                item(key = "weight_history_empty", contentType = "empty_placeholder") {
                     Text(
                         text = "No weight logs yet. Tap '+ Log Weight' to record your weight.",
                         style = MaterialTheme.typography.bodySmall,
@@ -271,7 +271,7 @@ fun ProgressScreen(
                     )
                 }
             } else {
-                items(uiState.weightLogs, key = { it.id }) { log ->
+                items(uiState.weightLogs, key = { it.id }, contentType = { "weight_log_row" }) { log ->
                     WeightLogRow(
                         log = log,
                         onDelete = { viewModel.deleteWeight(log) }

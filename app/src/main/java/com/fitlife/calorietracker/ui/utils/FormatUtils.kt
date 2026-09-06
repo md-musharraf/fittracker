@@ -18,6 +18,8 @@ enum class BudgetStatus(val label: String, val color: Color) {
 object FormatUtils {
 
     private val numberFormat = NumberFormat.getNumberInstance(Locale.US)
+    private val monthDayFormatter = DateTimeFormatter.ofPattern("MMM d", Locale.US)
+    private val fullDayFormatter = DateTimeFormatter.ofPattern("EEE, MMM d", Locale.US)
 
     fun formatCalories(calories: Double): String {
         return numberFormat.format(calories.roundToInt())
@@ -43,10 +45,10 @@ object FormatUtils {
         }
         val today = LocalDate.now()
         return when (date) {
-            today -> "Today, ${date.format(DateTimeFormatter.ofPattern("MMM d"))}"
-            today.minusDays(1) -> "Yesterday, ${date.format(DateTimeFormatter.ofPattern("MMM d"))}"
-            today.plusDays(1) -> "Tomorrow, ${date.format(DateTimeFormatter.ofPattern("MMM d"))}"
-            else -> date.format(DateTimeFormatter.ofPattern("EEE, MMM d"))
+            today -> "Today, ${date.format(monthDayFormatter)}"
+            today.minusDays(1) -> "Yesterday, ${date.format(monthDayFormatter)}"
+            today.plusDays(1) -> "Tomorrow, ${date.format(monthDayFormatter)}"
+            else -> date.format(fullDayFormatter)
         }
     }
 

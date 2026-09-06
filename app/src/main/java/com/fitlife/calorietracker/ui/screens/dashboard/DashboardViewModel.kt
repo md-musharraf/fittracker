@@ -1,5 +1,8 @@
 package com.fitlife.calorietracker.ui.screens.dashboard
 
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.fitlife.calorietracker.data.model.*
@@ -32,6 +35,22 @@ data class DashboardUiState(
     val lunchItems: List<MealLog> = mealLogs.filter { it.mealType == MealType.LUNCH.name }
     val dinnerItems: List<MealLog> = mealLogs.filter { it.mealType == MealType.DINNER.name }
     val snackItems: List<MealLog> = mealLogs.filter { it.mealType == MealType.SNACK.name }
+
+    val mealDistribution: Map<MealType, Int>
+        get() {
+            val total = totalCaloriesConsumed
+            if (total <= 0.0) return emptyMap()
+            val bf = ((breakfastItems.sumOf { it.calories } / total) * 100).toInt()
+            val lunch = ((lunchItems.sumOf { it.calories } / total) * 100).toInt()
+            val dinner = ((dinnerItems.sumOf { it.calories } / total) * 100).toInt()
+            val snack = ((snackItems.sumOf { it.calories } / total) * 100).toInt()
+            return mapOf(
+                MealType.BREAKFAST to bf,
+                MealType.LUNCH to lunch,
+                MealType.DINNER to dinner,
+                MealType.SNACK to snack
+            )
+        }
 }
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -96,6 +115,25 @@ class DashboardViewModel(
         initialValue = DashboardUiState()
     )
 
+    private val _snackbarEvent = MutableSharedFlow<Pair<String, String?>>(extraBufferCapacity = 10)
+    val snackbarEvent: SharedFlow<Pair<String, String?>> = merge(_snackbarEvent, repository.eventFlow)
+        .shareIn(viewModelScope, SharingStarted.Eagerly)
+
+    var duplicateWarningCandidate by mutableStateOf<MealLog?>(null)
+        private set
+
+    fun dismissDuplicateWarning() {
+        duplicateWarningCandidate = null
+    }
+
+    fun confirmAddDuplicate() {
+        val candidate = duplicateWarningCandidate ?: return
+        viewModelScope.launch {
+            repository.insertMealLog(candidate)
+            duplicateWarningCandidate = null
+        }
+    }
+
     fun changeDate(offsetDays: Long) {
         val current = LocalDate.parse(_selectedDate.value)
         _selectedDate.value = current.plusDays(offsetDays).toString()
@@ -119,6 +157,18 @@ class DashboardViewModel(
         }
     }
 
+    fun updateMeal(log: MealLog) {
+        viewModelScope.launch {
+            repository.updateMealLog(log)
+        }
+    }
+
+    fun clearMealType(mealType: MealType) {
+        viewModelScope.launch {
+            repository.clearMealsForType(_selectedDate.value, mealType.name)
+        }
+    }
+
     fun deleteMealItem(item: MealLog) {
         viewModelScope.launch {
             repository.deleteMealLog(item)
@@ -131,6 +181,12 @@ class DashboardViewModel(
         }
     }
 
+    fun undoAddMeal() {
+        viewModelScope.launch {
+            repository.undoLastAddedMeal()
+        }
+    }
+
     fun quickAddMeal(
         foodName: String,
         calories: Double,
@@ -140,6 +196,7 @@ class DashboardViewModel(
         mealType: MealType
     ) {
         viewModelScope.launch {
+            val isDup = repository.isRecentDuplicate(_selectedDate.value, mealType.name, foodName, withinSeconds = 60)
             val log = MealLog(
                 date = _selectedDate.value,
                 mealType = mealType.name,
@@ -149,7 +206,11 @@ class DashboardViewModel(
                 carbsGrams = carbs,
                 fatGrams = fat
             )
-            repository.insertMealLog(log)
+            if (isDup) {
+                duplicateWarningCandidate = log
+            } else {
+                repository.insertMealLog(log)
+            }
         }
     }
 
@@ -163,7 +224,12 @@ class DashboardViewModel(
         viewModelScope.launch {
             val current = LocalDate.parse(_selectedDate.value)
             val yesterday = current.minusDays(1).toString()
-            repository.copyMealsFromDate(yesterday, _selectedDate.value, mealType?.name)
+            val copiedCount = repository.copyMealsFromDate(yesterday, _selectedDate.value, mealType?.name)
+            if (copiedCount > 0) {
+                _snackbarEvent.emit(Pair("Copied $copiedCount meal items from yesterday", null))
+            } else {
+                _snackbarEvent.emit(Pair("No meals found in yesterday's log", null))
+            }
         }
     }
 }

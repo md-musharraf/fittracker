@@ -3,9 +3,7 @@ package com.fitlife.calorietracker.data.repository
 import com.fitlife.calorietracker.data.local.*
 import com.fitlife.calorietracker.data.model.*
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.withContext
 import java.time.LocalDate
 
@@ -18,8 +16,13 @@ class CalorieRepository(private val database: AppDatabase) {
     private val weightDao = database.weightDao()
     private val userProfileDao = database.userProfileDao()
 
-    // Last deleted meal for quick undo
+    // Undo tracking
     private var lastDeletedMeal: MealLog? = null
+    private var lastAddedMeal: MealLog? = null
+
+    // Event bus for instantaneous undo and notification across screens
+    private val _eventFlow = MutableSharedFlow<Pair<String, String?>>(extraBufferCapacity = 10)
+    val eventFlow: SharedFlow<Pair<String, String?>> = _eventFlow.asSharedFlow()
 
     // Foods
     fun getAllFoods(): Flow<List<FoodItem>> = foodDao.getAllFoods()
@@ -67,23 +70,61 @@ class CalorieRepository(private val database: AppDatabase) {
             fatGrams = ValidationUtils.sanitizeMacro(log.fatGrams),
             servingCount = log.servingCount.coerceIn(ValidationUtils.MIN_SERVING, ValidationUtils.MAX_SERVING)
         )
-        mealLogDao.insertMealLog(sanitized)
+        val id = mealLogDao.insertMealLog(sanitized)
+        val saved = sanitized.copy(id = id)
+        lastAddedMeal = saved
+        _eventFlow.tryEmit(Pair("Added ${saved.foodName} (${saved.calories.toInt()} kcal)", "Undo"))
+        id
+    }
+
+    suspend fun undoLastAddedMeal(): MealLog? = withContext(Dispatchers.IO) {
+        val item = lastAddedMeal ?: return@withContext null
+        mealLogDao.deleteMealLog(item)
+        lastAddedMeal = null
+        _eventFlow.tryEmit(Pair("Undone: Removed ${item.foodName}", null))
+        item
+    }
+
+    suspend fun updateMealLog(log: MealLog) = withContext(Dispatchers.IO) {
+        val sanitized = log.copy(
+            foodName = ValidationUtils.cleanName(log.foodName),
+            calories = ValidationUtils.sanitizeCalories(log.calories),
+            proteinGrams = ValidationUtils.sanitizeMacro(log.proteinGrams),
+            carbsGrams = ValidationUtils.sanitizeMacro(log.carbsGrams),
+            fatGrams = ValidationUtils.sanitizeMacro(log.fatGrams),
+            servingCount = log.servingCount.coerceIn(ValidationUtils.MIN_SERVING, ValidationUtils.MAX_SERVING)
+        )
+        mealLogDao.updateMealLog(sanitized)
+        _eventFlow.tryEmit(Pair("Updated ${sanitized.foodName}", null))
     }
 
     suspend fun deleteMealLog(log: MealLog) = withContext(Dispatchers.IO) {
         lastDeletedMeal = log
         mealLogDao.deleteMealLog(log)
+        _eventFlow.tryEmit(Pair("Removed ${log.foodName}", "Undo"))
     }
 
     suspend fun undoLastDeletedMeal(): MealLog? = withContext(Dispatchers.IO) {
         val item = lastDeletedMeal ?: return@withContext null
         mealLogDao.insertMealLog(item.copy(id = 0))
         lastDeletedMeal = null
+        _eventFlow.tryEmit(Pair("Restored ${item.foodName}", null))
         item
     }
 
     suspend fun deleteMealLogById(id: Long) = withContext(Dispatchers.IO) {
         mealLogDao.deleteMealLogById(id)
+    }
+
+    suspend fun clearMealsForType(date: String, mealType: String) = withContext(Dispatchers.IO) {
+        mealLogDao.clearMealsForType(date, mealType)
+        _eventFlow.tryEmit(Pair("Cleared all items from $mealType", null))
+    }
+
+    suspend fun isRecentDuplicate(date: String, mealType: String, foodName: String, withinSeconds: Long = 60): Boolean = withContext(Dispatchers.IO) {
+        val latest = mealLogDao.getLatestLogForFoodAndType(date, mealType, ValidationUtils.cleanName(foodName)) ?: return@withContext false
+        val diff = System.currentTimeMillis() - latest.timestamp
+        diff < (withinSeconds * 1000)
     }
 
     suspend fun copyMealsFromDate(sourceDate: String, targetDate: String, mealType: String? = null): Int = withContext(Dispatchers.IO) {

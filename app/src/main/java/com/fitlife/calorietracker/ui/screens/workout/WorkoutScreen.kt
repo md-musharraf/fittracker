@@ -65,7 +65,7 @@ fun WorkoutScreen(
             contentPadding = PaddingValues(top = 8.dp, bottom = 90.dp)
         ) {
             // Energy Summary Card
-            item {
+            item(key = "energy_summary_card", contentType = "energy_summary_card") {
                 Card(
                     shape = RoundedCornerShape(18.dp),
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
@@ -121,7 +121,7 @@ fun WorkoutScreen(
             }
 
             // Section Header
-            item {
+            item(key = "activities_header", contentType = "section_header") {
                 Text(
                     text = "Activities Logged Today",
                     style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
@@ -131,7 +131,7 @@ fun WorkoutScreen(
 
             // Workouts List
             if (uiState.workouts.isEmpty()) {
-                item {
+                item(key = "empty_workouts", contentType = "empty_placeholder") {
                     Card(
                         shape = RoundedCornerShape(16.dp),
                         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
@@ -174,7 +174,7 @@ fun WorkoutScreen(
                     }
                 }
             } else {
-                items(uiState.workouts, key = { it.id }) { workout ->
+                items(uiState.workouts, key = { it.id }, contentType = { "workout_item" }) { workout ->
                     WorkoutItemCard(
                         workout = workout,
                         onDelete = { viewModel.deleteWorkout(workout) }

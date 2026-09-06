@@ -89,12 +89,12 @@ fun GoalsBmiScreen(
             contentPadding = PaddingValues(top = 8.dp, bottom = 90.dp)
         ) {
             // BMI Gauge Card
-            item {
+            item(key = "bmi_gauge", contentType = "bmi_gauge") {
                 BmiGauge(bmiResult = liveBmi)
             }
 
             // Body Metrics Input Card
-            item {
+            item(key = "body_metrics", contentType = "body_metrics") {
                 Card(
                     shape = RoundedCornerShape(16.dp),
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
@@ -197,7 +197,7 @@ fun GoalsBmiScreen(
             }
 
             // Persona Selection (Gym Guy, Sports Person, Normal Person)
-            item {
+            item(key = "persona_selection", contentType = "persona_selection") {
                 Card(
                     shape = RoundedCornerShape(16.dp),
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
@@ -277,7 +277,7 @@ fun GoalsBmiScreen(
             }
 
             // Goal Type Selection
-            item {
+            item(key = "goal_type_selection", contentType = "goal_type_selection") {
                 Card(
                     shape = RoundedCornerShape(16.dp),
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
@@ -334,7 +334,7 @@ fun GoalsBmiScreen(
             }
 
             // Daily Targets & Macros
-            item {
+            item(key = "daily_targets", contentType = "daily_targets") {
                 Card(
                     shape = RoundedCornerShape(16.dp),
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
@@ -431,7 +431,7 @@ fun GoalsBmiScreen(
             }
 
             // Save Goals Button
-            item {
+            item(key = "save_goals_button", contentType = "save_button") {
                 Button(
                     onClick = {
                         val age = ValidationUtils.safeParseInt(ageText, default = 26, min = 12, max = 110)
@@ -476,7 +476,7 @@ fun GoalsBmiScreen(
             }
 
             // Data Backup & Export Section
-            item {
+            item(key = "data_backup_section", contentType = "data_backup") {
                 Card(
                     shape = RoundedCornerShape(16.dp),
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),

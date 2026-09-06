@@ -30,9 +30,18 @@ interface MealLogDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertMealLog(log: MealLog): Long
 
+    @Update
+    suspend fun updateMealLog(log: MealLog)
+
     @Delete
     suspend fun deleteMealLog(log: MealLog)
 
     @Query("DELETE FROM meal_logs WHERE id = :id")
     suspend fun deleteMealLogById(id: Long)
+
+    @Query("DELETE FROM meal_logs WHERE date = :date AND mealType = :mealType")
+    suspend fun clearMealsForType(date: String, mealType: String)
+
+    @Query("SELECT * FROM meal_logs WHERE date = :date AND mealType = :mealType AND foodName = :foodName ORDER BY timestamp DESC LIMIT 1")
+    suspend fun getLatestLogForFoodAndType(date: String, mealType: String, foodName: String): MealLog?
 }

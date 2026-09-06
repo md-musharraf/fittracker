@@ -101,4 +101,13 @@ class FoodLogViewModel(
             repository.insertMealLog(log)
         }
     }
+
+    fun undoLastAddedMeal(onUndone: (MealLog) -> Unit = {}) {
+        viewModelScope.launch {
+            val item = repository.undoLastAddedMeal()
+            if (item != null) {
+                onUndone(item)
+            }
+        }
+    }
 }

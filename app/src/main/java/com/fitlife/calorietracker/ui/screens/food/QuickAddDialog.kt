@@ -1,6 +1,8 @@
 package com.fitlife.calorietracker.ui.screens.food
 
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -63,14 +65,16 @@ fun QuickAddDialog(
             ) {
                 // Meal Type selector
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .horizontalScroll(rememberScrollState()),
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
                 ) {
                     MealType.entries.forEach { type ->
                         FilterChip(
                             selected = selectedMealType == type,
                             onClick = { selectedMealType = type },
-                            label = { Text(type.displayName, style = MaterialTheme.typography.labelSmall) }
+                            label = { Text(type.displayName, maxLines = 1, style = MaterialTheme.typography.labelSmall) }
                         )
                     }
                 }

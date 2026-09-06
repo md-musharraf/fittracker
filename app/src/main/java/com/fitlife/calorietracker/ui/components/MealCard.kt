@@ -32,10 +32,14 @@ fun MealCard(
     onAddFoodClick: () -> Unit,
     onQuickAddClick: () -> Unit,
     onDeleteItemClick: (MealLog) -> Unit,
+    onEditItemClick: ((MealLog) -> Unit)? = null,
+    onClearMealTypeClick: (() -> Unit)? = null,
     onCopyYesterdayClick: (() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     var isExpanded by remember { mutableStateOf(true) }
+    var showMenu by remember { mutableStateOf(false) }
+    var showClearConfirmation by remember { mutableStateOf(false) }
 
     val totalCalories = items.sumOf { it.calories }
     val totalProtein = items.sumOf { it.proteinGrams }
@@ -47,6 +51,31 @@ fun MealCard(
         MealType.LUNCH -> Icons.Default.Restaurant to Color(0xFFF97316)
         MealType.DINNER -> Icons.Default.Nightlife to Color(0xFFA855F7)
         MealType.SNACK -> Icons.Default.Fastfood to Color(0xFF38BDF8)
+    }
+
+    if (showClearConfirmation) {
+        AlertDialog(
+            onDismissRequest = { showClearConfirmation = false },
+            icon = { Icon(Icons.Default.DeleteSweep, contentDescription = null, tint = MaterialTheme.colorScheme.error) },
+            title = { Text("Clear ${mealType.displayName}?") },
+            text = { Text("Are you sure you want to remove all ${items.size} logged items from ${mealType.displayName}?") },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        showClearConfirmation = false
+                        onClearMealTypeClick?.invoke()
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
+                ) {
+                    Text("Clear All")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showClearConfirmation = false }) {
+                    Text("Cancel")
+                }
+            }
+        )
     }
 
     Card(
@@ -109,6 +138,58 @@ fun MealCard(
                         style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold),
                         color = MaterialTheme.colorScheme.primary
                     )
+
+                    if (items.isNotEmpty() || onCopyYesterdayClick != null) {
+                        Box {
+                            IconButton(
+                                onClick = { showMenu = true },
+                                modifier = Modifier.size(28.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.MoreVert,
+                                    contentDescription = "Options",
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                            DropdownMenu(
+                                expanded = showMenu,
+                                onDismissRequest = { showMenu = false }
+                            ) {
+                                if (items.isNotEmpty() && onClearMealTypeClick != null) {
+                                    DropdownMenuItem(
+                                        text = { Text("Clear ${mealType.displayName}") },
+                                        leadingIcon = {
+                                            Icon(
+                                                imageVector = Icons.Default.DeleteSweep,
+                                                contentDescription = null,
+                                                tint = MaterialTheme.colorScheme.error
+                                            )
+                                        },
+                                        onClick = {
+                                            showMenu = false
+                                            showClearConfirmation = true
+                                        }
+                                    )
+                                }
+                                if (onCopyYesterdayClick != null) {
+                                    DropdownMenuItem(
+                                        text = { Text("Copy Yesterday's ${mealType.displayName}") },
+                                        leadingIcon = {
+                                            Icon(
+                                                imageVector = Icons.Default.History,
+                                                contentDescription = null
+                                            )
+                                        },
+                                        onClick = {
+                                            showMenu = false
+                                            onCopyYesterdayClick()
+                                        }
+                                    )
+                                }
+                            }
+                        }
+                    }
+
                     IconButton(
                         onClick = { isExpanded = !isExpanded },
                         modifier = Modifier.size(28.dp)
@@ -136,6 +217,7 @@ fun MealCard(
                         items.forEach { item ->
                             MealItemRow(
                                 item = item,
+                                onEdit = { onEditItemClick?.invoke(item) },
                                 onDelete = { onDeleteItemClick(item) }
                             )
                         }
@@ -191,21 +273,32 @@ fun MealCard(
 @Composable
 fun MealItemRow(
     item: MealLog,
+    onEdit: () -> Unit = {},
     onDelete: () -> Unit
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 6.dp),
+            .clip(RoundedCornerShape(10.dp))
+            .clickable { onEdit() }
+            .padding(vertical = 6.dp, horizontal = 4.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
         Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = item.foodName,
-                style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold),
-                color = MaterialTheme.colorScheme.onSurface
-            )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    text = item.foodName,
+                    style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold),
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                if (item.servingCount != 1.0) {
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Badge(containerColor = MaterialTheme.colorScheme.surfaceVariant) {
+                        Text("${item.servingCount}x", fontSize = 10.sp)
+                    }
+                }
+            }
             Text(
                 text = "${item.calories.roundToInt()} kcal  •  ${item.proteinGrams.roundToInt()}g P  ${item.carbsGrams.roundToInt()}g C  ${item.fatGrams.roundToInt()}g F",
                 style = MaterialTheme.typography.bodySmall,
@@ -213,16 +306,30 @@ fun MealItemRow(
             )
         }
 
-        IconButton(
-            onClick = onDelete,
-            modifier = Modifier.size(32.dp)
-        ) {
-            Icon(
-                imageVector = Icons.Default.Close,
-                contentDescription = "Remove",
-                tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
-                modifier = Modifier.size(16.dp)
-            )
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            IconButton(
+                onClick = onEdit,
+                modifier = Modifier.size(32.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Edit,
+                    contentDescription = "Edit Meal",
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                    modifier = Modifier.size(16.dp)
+                )
+            }
+
+            IconButton(
+                onClick = onDelete,
+                modifier = Modifier.size(32.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Close,
+                    contentDescription = "Remove",
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                    modifier = Modifier.size(16.dp)
+                )
+            }
         }
     }
 }

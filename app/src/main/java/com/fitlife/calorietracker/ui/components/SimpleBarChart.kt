@@ -79,57 +79,68 @@ fun SimpleWeeklyBarChart(
                 verticalAlignment = Alignment.Bottom
             ) {
                 weeklyData.forEach { item ->
-                    val fraction = (item.caloriesConsumed / maxCalories).toFloat().coerceIn(0.04f, 1f)
-                    val animatedFraction by animateFloatAsState(
-                        targetValue = fraction,
-                        animationSpec = tween(durationMillis = 600),
-                        label = "BarHeight"
+                    WeeklyBarItem(
+                        item = item,
+                        maxCalories = maxCalories
                     )
-
-                    val barColor = when {
-                        item.caloriesConsumed == 0.0 -> MaterialTheme.colorScheme.surfaceVariant
-                        item.caloriesConsumed > item.calorieGoal * 1.1 -> Color(0xFFEF4444)
-                        item.caloriesConsumed >= item.calorieGoal * 0.9 -> AccentGreen
-                        else -> CaloriesColor
-                    }
-
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        // Calorie text above bar
-                        if (item.caloriesConsumed > 0) {
-                            Text(
-                                text = "${item.caloriesConsumed.roundToInt()}",
-                                style = MaterialTheme.typography.labelSmall.copy(fontSize = 9.sp),
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                            Spacer(modifier = Modifier.height(4.dp))
-                        }
-
-                        // Bar
-                        Box(
-                            modifier = Modifier
-                                .width(22.dp)
-                                .weight(1f, fill = false)
-                                .fillMaxHeight(animatedFraction)
-                                .clip(RoundedCornerShape(topStart = 6.dp, topEnd = 6.dp))
-                                .background(barColor)
-                        )
-
-                        Spacer(modifier = Modifier.height(6.dp))
-
-                        // Day label
-                        Text(
-                            text = item.dayLabel,
-                            style = MaterialTheme.typography.labelSmall.copy(
-                                fontWeight = if (item.isToday) FontWeight.Bold else FontWeight.Normal,
-                                color = if (item.isToday) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        )
-                    }
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun RowScope.WeeklyBarItem(
+    item: DailyBarData,
+    maxCalories: Double
+) {
+    val fraction = (item.caloriesConsumed / maxCalories).toFloat().coerceIn(0.04f, 1f)
+    val animatedFraction by animateFloatAsState(
+        targetValue = fraction,
+        animationSpec = tween(durationMillis = 600),
+        label = "BarHeight"
+    )
+
+    val barColor = when {
+        item.caloriesConsumed == 0.0 -> MaterialTheme.colorScheme.surfaceVariant
+        item.caloriesConsumed > item.calorieGoal * 1.1 -> Color(0xFFEF4444)
+        item.caloriesConsumed >= item.calorieGoal * 0.9 -> AccentGreen
+        else -> CaloriesColor
+    }
+
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.weight(1f)
+    ) {
+        // Calorie text above bar
+        if (item.caloriesConsumed > 0) {
+            Text(
+                text = "${item.caloriesConsumed.roundToInt()}",
+                style = MaterialTheme.typography.labelSmall.copy(fontSize = 9.sp),
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+        }
+
+        // Bar
+        Box(
+            modifier = Modifier
+                .width(22.dp)
+                .weight(1f, fill = false)
+                .fillMaxHeight(animatedFraction)
+                .clip(RoundedCornerShape(topStart = 6.dp, topEnd = 6.dp))
+                .background(barColor)
+        )
+
+        Spacer(modifier = Modifier.height(6.dp))
+
+        // Day label
+        Text(
+            text = item.dayLabel,
+            style = MaterialTheme.typography.labelSmall.copy(
+                fontWeight = if (item.isToday) FontWeight.Bold else FontWeight.Normal,
+                color = if (item.isToday) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        )
     }
 }

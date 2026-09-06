@@ -50,7 +50,7 @@ fun BmiGauge(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Column {
+                Column(modifier = Modifier.weight(1f).padding(end = 8.dp)) {
                     Text(
                         text = "Body Mass Index (BMI)",
                         style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
@@ -74,7 +74,8 @@ fun BmiGauge(
                     Text(
                         text = bmiResult.category,
                         style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
-                        color = categoryColor
+                        color = categoryColor,
+                        maxLines = 1
                     )
                 }
             }

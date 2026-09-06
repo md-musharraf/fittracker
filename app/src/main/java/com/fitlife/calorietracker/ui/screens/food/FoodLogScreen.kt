@@ -134,22 +134,45 @@ fun FoodLogScreen(
                                     modifier = Modifier.size(48.dp)
                                 )
                                 Spacer(modifier = Modifier.height(12.dp))
-                                Text(
-                                    text = "No foods found",
-                                    style = MaterialTheme.typography.titleMedium,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                                Spacer(modifier = Modifier.height(4.dp))
-                                Text(
-                                    text = "Try a different search or create a custom food!",
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
+                                if (uiState.searchQuery.isNotBlank()) {
+                                    Text(
+                                        text = "No foods found for '${uiState.searchQuery}'",
+                                        style = MaterialTheme.typography.titleMedium,
+                                        color = MaterialTheme.colorScheme.onSurface
+                                    )
+                                    Spacer(modifier = Modifier.height(8.dp))
+                                    Text(
+                                        text = "Easily add this food with custom calories & macros:",
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                    Spacer(modifier = Modifier.height(14.dp))
+                                    Button(
+                                        onClick = { showCreateDialog = true },
+                                        shape = RoundedCornerShape(12.dp)
+                                    ) {
+                                        Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(16.dp))
+                                        Spacer(modifier = Modifier.width(6.dp))
+                                        Text("Quick Add '${uiState.searchQuery}'")
+                                    }
+                                } else {
+                                    Text(
+                                        text = "No foods in this category",
+                                        style = MaterialTheme.typography.titleMedium,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                    Spacer(modifier = Modifier.height(4.dp))
+                                    Text(
+                                        text = "Try a different search or create a custom food!",
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
                             }
                         }
                     }
                 } else {
-                    items(uiState.foods, key = { it.id }) { food ->
+                    items(uiState.foods, key = { it.id }, contentType = { "food_item" }) { food ->
                         FoodCardItem(
                             food = food,
                             onFoodClick = { selectedFoodForPortion = food },
@@ -177,6 +200,7 @@ fun FoodLogScreen(
         // Create Custom Food Dialog
         if (showCreateDialog) {
             CreateCustomFoodDialog(
+                initialName = uiState.searchQuery,
                 onDismiss = { showCreateDialog = false },
                 onSave = { customFood ->
                     viewModel.createCustomFood(customFood)
@@ -208,16 +232,26 @@ fun FoodCardItem(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column(modifier = Modifier.weight(1f)) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        text = food.name,
-                        style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                    if (food.isCustom) {
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Badge(containerColor = MaterialTheme.colorScheme.primaryContainer) {
-                            Text("Custom", fontSize = 10.sp)
+                Text(
+                    text = food.name,
+                    style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                if (food.isCustom || food.proteinGrams >= 15.0) {
+                    Spacer(modifier = Modifier.height(3.dp))
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        if (food.isCustom) {
+                            Badge(containerColor = MaterialTheme.colorScheme.primaryContainer) {
+                                Text("Custom", fontSize = 10.sp)
+                            }
+                        }
+                        if (food.proteinGrams >= 15.0) {
+                            Badge(containerColor = ProteinColor.copy(alpha = 0.2f)) {
+                                Text("High Protein 💪", color = ProteinColor, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                            }
                         }
                     }
                 }

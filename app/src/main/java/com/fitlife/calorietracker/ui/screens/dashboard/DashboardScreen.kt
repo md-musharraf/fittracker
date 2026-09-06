@@ -26,6 +26,7 @@ import com.fitlife.calorietracker.data.model.MealLog
 import com.fitlife.calorietracker.data.model.MealType
 import com.fitlife.calorietracker.data.model.SmartDefaults
 import com.fitlife.calorietracker.ui.components.*
+import com.fitlife.calorietracker.ui.screens.food.EditMealDialog
 import com.fitlife.calorietracker.ui.screens.food.QuickAddDialog
 import com.fitlife.calorietracker.ui.theme.*
 import com.fitlife.calorietracker.ui.utils.FormatUtils
@@ -49,6 +50,34 @@ fun DashboardScreen(
     val haptic = LocalHapticFeedback.current
 
     var quickAddMealType by remember { mutableStateOf<MealType?>(null) }
+    var mealToEdit by remember { mutableStateOf<MealLog?>(null) }
+
+    LaunchedEffect(Unit) {
+        viewModel.snackbarEvent.collect { (message, actionLabel) ->
+            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+            if (actionLabel != null) {
+                val result = snackbarHostState.showSnackbar(
+                    message = message,
+                    actionLabel = actionLabel,
+                    duration = SnackbarDuration.Short
+                )
+                if (result == SnackbarResult.ActionPerformed) {
+                    if (actionLabel == "Undo") {
+                        if (message.startsWith("Added")) {
+                            viewModel.undoAddMeal()
+                        } else if (message.startsWith("Removed")) {
+                            viewModel.undoDeleteMeal()
+                        }
+                    }
+                }
+            } else {
+                snackbarHostState.showSnackbar(
+                    message = message,
+                    duration = SnackbarDuration.Short
+                )
+            }
+        }
+    }
 
     val currentDate = try {
         LocalDate.parse(uiState.selectedDate)
@@ -57,6 +86,7 @@ fun DashboardScreen(
     }
 
     val dateFormatted = FormatUtils.formatDateHeading(uiState.selectedDate)
+    val recentFoodsList = remember(uiState.recentFoods) { uiState.recentFoods.take(10) }
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
@@ -110,7 +140,7 @@ fun DashboardScreen(
             contentPadding = PaddingValues(top = 4.dp, bottom = 80.dp)
         ) {
             // Date Switcher Row
-            item {
+            item(key = "date_switcher", contentType = "date_switcher") {
                 Card(
                     shape = RoundedCornerShape(14.dp),
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
@@ -155,13 +185,13 @@ fun DashboardScreen(
             }
 
             // Consistency & Daily Streak Banner
-            item {
+            item(key = "streak_banner", contentType = "streak") {
                 StreakBanner(streakInfo = uiState.streakInfo)
             }
 
             // Smart Daily Tip
-            item {
-                if (uiState.dailyTip.isNotEmpty()) {
+            if (uiState.dailyTip.isNotEmpty()) {
+                item(key = "daily_tip", contentType = "tip") {
                     Card(
                         shape = RoundedCornerShape(14.dp),
                         colors = CardDefaults.cardColors(
@@ -189,7 +219,7 @@ fun DashboardScreen(
             }
 
             // Calorie Ring & Summary Card
-            item {
+            item(key = "calorie_summary", contentType = "calorie_summary") {
                 Card(
                     shape = RoundedCornerShape(20.dp),
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
@@ -291,12 +321,69 @@ fun DashboardScreen(
                             fatGrams = uiState.totalFatConsumed,
                             fatTarget = uiState.userProfile.fatGoalGrams
                         )
+
+                        // Calorie Split Breakdown by Meal
+                        if (uiState.totalCaloriesConsumed > 0) {
+                            Spacer(modifier = Modifier.height(16.dp))
+                            HorizontalDivider(color = MaterialTheme.colorScheme.surfaceVariant, thickness = 0.8.dp)
+                            Spacer(modifier = Modifier.height(12.dp))
+
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = "Meal Calorie Split",
+                                    style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                                Text(
+                                    text = "Daily Intake %",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+                                )
+                            }
+                            Spacer(modifier = Modifier.height(8.dp))
+
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(6.dp)
+                            ) {
+                                val dist = uiState.mealDistribution
+                                val splitItems = listOf(
+                                    Triple("Bfast", dist[MealType.BREAKFAST] ?: 0, Color(0xFFFBBF24)),
+                                    Triple("Lunch", dist[MealType.LUNCH] ?: 0, Color(0xFFF97316)),
+                                    Triple("Dinner", dist[MealType.DINNER] ?: 0, Color(0xFFA855F7)),
+                                    Triple("Snack", dist[MealType.SNACK] ?: 0, Color(0xFF38BDF8))
+                                )
+                                splitItems.forEach { (name, pct, color) ->
+                                    Card(
+                                        shape = RoundedCornerShape(8.dp),
+                                        colors = CardDefaults.cardColors(containerColor = color.copy(alpha = 0.12f)),
+                                        modifier = Modifier.weight(1f)
+                                    ) {
+                                        Column(
+                                            modifier = Modifier.padding(vertical = 6.dp, horizontal = 4.dp),
+                                            horizontalAlignment = Alignment.CenterHorizontally
+                                        ) {
+                                            Text(name, style = MaterialTheme.typography.labelSmall, color = color, maxLines = 1)
+                                            Text(
+                                                "$pct%",
+                                                style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
+                                                color = MaterialTheme.colorScheme.onSurface
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
 
             // Workouts Activity Quick Card
-            item {
+            item(key = "workouts_card", contentType = "workouts_card") {
                 Card(
                     shape = RoundedCornerShape(16.dp),
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
@@ -355,7 +442,7 @@ fun DashboardScreen(
             }
 
             // Hydration Card
-            item {
+            item(key = "hydration_card", contentType = "hydration_card") {
                 WaterTrackerWidget(
                     currentMl = uiState.waterLog?.amountMl ?: 0,
                     targetMl = uiState.userProfile.dailyWaterGoalMl,
@@ -371,8 +458,8 @@ fun DashboardScreen(
             }
 
             // Quick Re-Log Recent Foods
-            if (uiState.recentFoods.isNotEmpty()) {
-                item {
+            if (recentFoodsList.isNotEmpty()) {
+                item(key = "recent_foods_header", contentType = "section_header") {
                     Text(
                         text = "Quick Re-Log ⚡",
                         style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
@@ -380,11 +467,11 @@ fun DashboardScreen(
                         modifier = Modifier.padding(top = 8.dp)
                     )
                 }
-                item {
+                item(key = "recent_foods_row", contentType = "recent_foods_row") {
                     LazyRow(
                         horizontalArrangement = Arrangement.spacedBy(10.dp)
                     ) {
-                        items(uiState.recentFoods.take(10), key = { it.id }) { recentItem ->
+                        items(recentFoodsList, key = { it.id }) { recentItem ->
                             val autoMealType = SmartDefaults.detectMealType()
                             AssistChip(
                                 onClick = {
@@ -429,7 +516,7 @@ fun DashboardScreen(
             }
 
             // Meals Section Header
-            item {
+            item(key = "meals_header", contentType = "section_header") {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -457,62 +544,60 @@ fun DashboardScreen(
             val onMealDeleted: (MealLog) -> Unit = { item ->
                 haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                 viewModel.deleteMealItem(item)
-                scope.launch {
-                    val result = snackbarHostState.showSnackbar(
-                        message = "Removed ${item.foodName}",
-                        actionLabel = "Undo",
-                        duration = SnackbarDuration.Short
-                    )
-                    if (result == SnackbarResult.ActionPerformed) {
-                        viewModel.undoDeleteMeal()
-                    }
-                }
             }
 
             // Breakfast Card
-            item {
+            item(key = "meal_breakfast", contentType = "meal_card") {
                 MealCard(
                     mealType = MealType.BREAKFAST,
                     items = uiState.breakfastItems,
                     onAddFoodClick = { onNavigateToFoodSearch(MealType.BREAKFAST.name) },
                     onQuickAddClick = { quickAddMealType = MealType.BREAKFAST },
                     onDeleteItemClick = onMealDeleted,
+                    onEditItemClick = { mealToEdit = it },
+                    onClearMealTypeClick = { viewModel.clearMealType(MealType.BREAKFAST) },
                     onCopyYesterdayClick = { viewModel.copyYesterdayMeals(MealType.BREAKFAST) }
                 )
             }
 
             // Lunch Card
-            item {
+            item(key = "meal_lunch", contentType = "meal_card") {
                 MealCard(
                     mealType = MealType.LUNCH,
                     items = uiState.lunchItems,
                     onAddFoodClick = { onNavigateToFoodSearch(MealType.LUNCH.name) },
                     onQuickAddClick = { quickAddMealType = MealType.LUNCH },
                     onDeleteItemClick = onMealDeleted,
+                    onEditItemClick = { mealToEdit = it },
+                    onClearMealTypeClick = { viewModel.clearMealType(MealType.LUNCH) },
                     onCopyYesterdayClick = { viewModel.copyYesterdayMeals(MealType.LUNCH) }
                 )
             }
 
             // Dinner Card
-            item {
+            item(key = "meal_dinner", contentType = "meal_card") {
                 MealCard(
                     mealType = MealType.DINNER,
                     items = uiState.dinnerItems,
                     onAddFoodClick = { onNavigateToFoodSearch(MealType.DINNER.name) },
                     onQuickAddClick = { quickAddMealType = MealType.DINNER },
                     onDeleteItemClick = onMealDeleted,
+                    onEditItemClick = { mealToEdit = it },
+                    onClearMealTypeClick = { viewModel.clearMealType(MealType.DINNER) },
                     onCopyYesterdayClick = { viewModel.copyYesterdayMeals(MealType.DINNER) }
                 )
             }
 
             // Snacks Card
-            item {
+            item(key = "meal_snack", contentType = "meal_card") {
                 MealCard(
                     mealType = MealType.SNACK,
                     items = uiState.snackItems,
                     onAddFoodClick = { onNavigateToFoodSearch(MealType.SNACK.name) },
                     onQuickAddClick = { quickAddMealType = MealType.SNACK },
                     onDeleteItemClick = onMealDeleted,
+                    onEditItemClick = { mealToEdit = it },
+                    onClearMealTypeClick = { viewModel.clearMealType(MealType.SNACK) },
                     onCopyYesterdayClick = { viewModel.copyYesterdayMeals(MealType.SNACK) }
                 )
             }
@@ -526,6 +611,51 @@ fun DashboardScreen(
                 onConfirm = { name, calories, p, c, f, type ->
                     viewModel.quickAddMeal(name, calories, p, c, f, type)
                     quickAddMealType = null
+                }
+            )
+        }
+
+        // Edit Meal Dialog
+        mealToEdit?.let { log ->
+            EditMealDialog(
+                mealLog = log,
+                onDismiss = { mealToEdit = null },
+                onSave = { updated ->
+                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                    viewModel.updateMeal(updated)
+                    mealToEdit = null
+                },
+                onDelete = {
+                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                    viewModel.deleteMealItem(log)
+                    mealToEdit = null
+                }
+            )
+        }
+
+        // Duplicate Warning Alert Dialog
+        viewModel.duplicateWarningCandidate?.let { candidate ->
+            AlertDialog(
+                onDismissRequest = { viewModel.dismissDuplicateWarning() },
+                icon = { Icon(Icons.Default.WarningAmber, contentDescription = null, tint = PrimaryOrange) },
+                title = { Text("Duplicate Meal Logged") },
+                text = {
+                    Text("You already logged '${candidate.foodName}' under ${candidate.mealType} a moment ago.\n\nDid you mean to add another serving?")
+                },
+                confirmButton = {
+                    Button(
+                        onClick = {
+                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                            viewModel.confirmAddDuplicate()
+                        }
+                    ) {
+                        Text("Yes, Log Again")
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { viewModel.dismissDuplicateWarning() }) {
+                        Text("Cancel")
+                    }
                 }
             )
         }

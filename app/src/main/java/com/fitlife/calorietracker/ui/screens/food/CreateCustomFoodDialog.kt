@@ -12,12 +12,15 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.fitlife.calorietracker.data.model.FoodItem
 
+import com.fitlife.calorietracker.data.model.SmartDefaults
+
 @Composable
 fun CreateCustomFoodDialog(
+    initialName: String = "",
     onDismiss: () -> Unit,
     onSave: (FoodItem) -> Unit
 ) {
-    var name by remember { mutableStateOf("") }
+    var name by remember { mutableStateOf(initialName) }
     var brand by remember { mutableStateOf("") }
     var servingSize by remember { mutableStateOf("100g") }
     var caloriesText by remember { mutableStateOf("") }
@@ -26,8 +29,21 @@ fun CreateCustomFoodDialog(
     var fatText by remember { mutableStateOf("") }
     var fiberText by remember { mutableStateOf("") }
     var category by remember { mutableStateOf("Gym Staples") }
+    var hasManuallyEditedMacros by remember { mutableStateOf(false) }
 
-    val categories = listOf("Proteins", "Carbs", "Fats", "Gym Staples", "Fruits & Veggies", "Snacks", "Beverages")
+    LaunchedEffect(caloriesText) {
+        if (!hasManuallyEditedMacros) {
+            val cal = caloriesText.toDoubleOrNull()
+            if (cal != null && cal > 0) {
+                val (p, c, f) = SmartDefaults.estimateMacrosFromCalories(cal)
+                proteinText = p.toString()
+                carbsText = c.toString()
+                fatText = f.toString()
+            }
+        }
+    }
+
+    val categories = listOf("Proteins", "Carbs", "Fats", "Gym Staples", "Fruits & Veggies", "Indian Food", "Snacks", "Beverages")
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -83,7 +99,10 @@ fun CreateCustomFoodDialog(
                 ) {
                     OutlinedTextField(
                         value = proteinText,
-                        onValueChange = { proteinText = it },
+                        onValueChange = { 
+                            proteinText = it
+                            hasManuallyEditedMacros = true 
+                        },
                         label = { Text("Protein (g) *") },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                         singleLine = true,
@@ -91,7 +110,10 @@ fun CreateCustomFoodDialog(
                     )
                     OutlinedTextField(
                         value = carbsText,
-                        onValueChange = { carbsText = it },
+                        onValueChange = { 
+                            carbsText = it
+                            hasManuallyEditedMacros = true 
+                        },
                         label = { Text("Carbs (g) *") },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                         singleLine = true,
@@ -99,7 +121,10 @@ fun CreateCustomFoodDialog(
                     )
                     OutlinedTextField(
                         value = fatText,
-                        onValueChange = { fatText = it },
+                        onValueChange = { 
+                            fatText = it
+                            hasManuallyEditedMacros = true 
+                        },
                         label = { Text("Fat (g) *") },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                         singleLine = true,
