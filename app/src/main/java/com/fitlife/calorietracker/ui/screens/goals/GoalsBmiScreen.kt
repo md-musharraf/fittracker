@@ -349,7 +349,8 @@ fun GoalsBmiScreen(
                             Text(
                                 text = "Daily Targets & Macro Split",
                                 style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-                                color = MaterialTheme.colorScheme.onSurface
+                                color = MaterialTheme.colorScheme.onSurface,
+                                modifier = Modifier.weight(1f)
                             )
                             TextButton(
                                 onClick = {
@@ -367,9 +368,15 @@ fun GoalsBmiScreen(
                                     carbsGoalText = rec.carbsGrams.toString()
                                     fatGoalText = rec.fatGrams.toString()
                                     waterGoalText = rec.waterMl.toString()
-                                }
+                                },
+                                contentPadding = PaddingValues(horizontal = 8.dp, vertical = 2.dp)
                             ) {
-                                Text("Auto-Tune")
+                                Text(
+                                    text = "Auto-Tune ⚡",
+                                    maxLines = 1,
+                                    softWrap = false,
+                                    style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold)
+                                )
                             }
                         }
 
