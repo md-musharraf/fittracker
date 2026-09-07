@@ -48,6 +48,8 @@ fun AddFoodPortionDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
+        shape = RoundedCornerShape(24.dp),
+        containerColor = MaterialTheme.colorScheme.surface,
         title = {
             Column {
                 Text(
@@ -230,9 +232,10 @@ fun AddFoodPortionDialog(
                     if (multiplier > 0) {
                         onConfirm(multiplier, selectedMealType)
                     }
-                }
+                },
+                shape = RoundedCornerShape(12.dp)
             ) {
-                Text("Log to ${selectedMealType.displayName}")
+                Text("Log to ${selectedMealType.displayName}", fontWeight = FontWeight.Bold)
             }
         },
         dismissButton = {

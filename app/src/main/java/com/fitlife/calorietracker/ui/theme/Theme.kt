@@ -11,38 +11,38 @@ import androidx.core.view.WindowCompat
 
 private val DarkColorScheme = darkColorScheme(
     primary = PrimaryOrange,
-    onPrimary = DarkBackground,
-    primaryContainer = DarkSurfaceBorder,
+    onPrimary = androidx.compose.ui.graphics.Color.White,
+    primaryContainer = DarkPrimaryContainer,
     onPrimaryContainer = PrimaryOrangeLight,
     secondary = AccentGreen,
-    onSecondary = DarkBackground,
-    secondaryContainer = DarkSurfaceBorder,
-    onSecondaryContainer = AccentGreenLight,
+    onSecondary = androidx.compose.ui.graphics.Color.White,
+    secondaryContainer = PrimaryOrange.copy(alpha = 0.18f),
+    onSecondaryContainer = PrimaryOrange,
     background = DarkBackground,
     onBackground = TextPrimaryDark,
     surface = DarkSurface,
     onSurface = TextPrimaryDark,
     surfaceVariant = DarkSurfaceElevated,
     onSurfaceVariant = TextSecondaryDark,
-    outline = DarkSurfaceBorder
+    outline = DarkCardBorder
 )
 
 private val LightColorScheme = lightColorScheme(
     primary = PrimaryOrangeDark,
-    onPrimary = LightSurface,
-    primaryContainer = PrimaryOrangeLight.copy(alpha = 0.2f),
+    onPrimary = androidx.compose.ui.graphics.Color.White,
+    primaryContainer = LightPrimaryContainer,
     onPrimaryContainer = PrimaryOrangeDark,
     secondary = AccentGreenDark,
-    onSecondary = LightSurface,
-    secondaryContainer = AccentGreenLight.copy(alpha = 0.2f),
-    onSecondaryContainer = AccentGreenDark,
+    onSecondary = androidx.compose.ui.graphics.Color.White,
+    secondaryContainer = LightPrimaryContainer,
+    onSecondaryContainer = PrimaryOrangeDark,
     background = LightBackground,
     onBackground = TextPrimaryLight,
     surface = LightSurface,
     onSurface = TextPrimaryLight,
     surfaceVariant = LightSurfaceElevated,
     onSurfaceVariant = TextSecondaryLight,
-    outline = LightSurfaceBorder
+    outline = LightCardBorder
 )
 
 @Composable
@@ -56,7 +56,10 @@ fun CalorieTrackerTheme(
         SideEffect {
             val window = (view.context as Activity).window
             window.statusBarColor = colorScheme.background.toArgb()
-            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
+            window.navigationBarColor = colorScheme.surface.toArgb()
+            val insetsController = WindowCompat.getInsetsController(window, view)
+            insetsController.isAppearanceLightStatusBars = !darkTheme
+            insetsController.isAppearanceLightNavigationBars = !darkTheme
         }
     }
 

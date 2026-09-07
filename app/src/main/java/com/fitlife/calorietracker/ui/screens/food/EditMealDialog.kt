@@ -97,6 +97,8 @@ fun EditMealDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
+        shape = RoundedCornerShape(24.dp),
+        containerColor = MaterialTheme.colorScheme.surface,
         title = {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -312,9 +314,9 @@ fun EditMealDialog(
                     )
                     onSave(updated)
                 },
-                shape = RoundedCornerShape(10.dp)
+                shape = RoundedCornerShape(12.dp)
             ) {
-                Text("Save Changes")
+                Text("Save Changes", fontWeight = FontWeight.Bold)
             }
         },
         dismissButton = {

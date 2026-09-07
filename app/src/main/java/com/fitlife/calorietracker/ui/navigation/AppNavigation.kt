@@ -27,6 +27,9 @@ import com.fitlife.calorietracker.ui.screens.progress.ProgressScreen
 import com.fitlife.calorietracker.ui.screens.progress.ProgressViewModel
 import com.fitlife.calorietracker.ui.screens.workout.WorkoutScreen
 import com.fitlife.calorietracker.ui.screens.workout.WorkoutViewModel
+import com.fitlife.calorietracker.ui.theme.PrimaryOrange
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 
 sealed class Screen(val route: String, val title: String, val icon: ImageVector) {
     object Dashboard : Screen("dashboard", "Today", Icons.Default.Dashboard)
@@ -58,12 +61,19 @@ fun MainAppScaffold(
         bottomBar = {
             NavigationBar(
                 containerColor = MaterialTheme.colorScheme.surface,
-                tonalElevation = NavigationBarDefaults.Elevation
+                tonalElevation = 6.dp
             ) {
                 BottomNavItems.forEach { screen ->
                     val isSelected = currentRoute?.startsWith(screen.route.substringBefore("?")) == true
                     NavigationBarItem(
                         selected = isSelected,
+                        colors = NavigationBarItemDefaults.colors(
+                            selectedIconColor = PrimaryOrange,
+                            selectedTextColor = PrimaryOrange,
+                            indicatorColor = PrimaryOrange.copy(alpha = 0.16f),
+                            unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                            unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant
+                        ),
                         onClick = {
                             if (!isSelected) {
                                 val destination = if (screen == Screen.FoodLog) {
@@ -81,7 +91,14 @@ fun MainAppScaffold(
                             }
                         },
                         icon = { Icon(screen.icon, contentDescription = screen.title) },
-                        label = { Text(screen.title, style = MaterialTheme.typography.labelSmall) }
+                        label = {
+                            Text(
+                                screen.title,
+                                style = MaterialTheme.typography.labelSmall.copy(
+                                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium
+                                )
+                            )
+                        }
                     )
                 }
             }

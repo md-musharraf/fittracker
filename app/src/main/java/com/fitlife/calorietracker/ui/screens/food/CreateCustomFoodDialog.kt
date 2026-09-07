@@ -2,6 +2,7 @@ package com.fitlife.calorietracker.ui.screens.food
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
@@ -47,6 +48,8 @@ fun CreateCustomFoodDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
+        shape = RoundedCornerShape(24.dp),
+        containerColor = MaterialTheme.colorScheme.surface,
         title = {
             Text(
                 text = "New Custom Food",
@@ -167,9 +170,10 @@ fun CreateCustomFoodDialog(
                             )
                         )
                     }
-                }
+                },
+                shape = RoundedCornerShape(12.dp)
             ) {
-                Text("Save to Food Library")
+                Text("Save to Food Library", fontWeight = FontWeight.Bold)
             }
         },
         dismissButton = {

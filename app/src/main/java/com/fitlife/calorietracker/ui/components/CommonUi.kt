@@ -31,7 +31,7 @@ fun StreakBanner(
     modifier: Modifier = Modifier
 ) {
     Card(
-        shape = RoundedCornerShape(14.dp),
+        shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
         ),
@@ -39,8 +39,8 @@ fun StreakBanner(
             .fillMaxWidth()
             .border(
                 width = 1.dp,
-                color = if (streakInfo.currentStreak > 0) PrimaryOrange.copy(alpha = 0.4f) else Color.Transparent,
-                shape = RoundedCornerShape(14.dp)
+                color = if (streakInfo.currentStreak > 0) PrimaryOrange.copy(alpha = 0.5f) else MaterialTheme.colorScheme.outline.copy(alpha = 0.4f),
+                shape = RoundedCornerShape(16.dp)
             )
     ) {
         Row(
@@ -138,8 +138,9 @@ fun EmptyStateCard(
     onActionClick: (() -> Unit)? = null
 ) {
     Card(
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(18.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.5f)),
         modifier = modifier.fillMaxWidth()
     ) {
         Column(
@@ -150,7 +151,7 @@ fun EmptyStateCard(
         ) {
             Box(
                 modifier = Modifier
-                    .size(48.dp)
+                    .size(52.dp)
                     .clip(CircleShape)
                     .background(iconTint.copy(alpha = 0.15f)),
                 contentAlignment = Alignment.Center
@@ -159,11 +160,11 @@ fun EmptyStateCard(
                     imageVector = icon,
                     contentDescription = null,
                     tint = iconTint,
-                    modifier = Modifier.size(26.dp)
+                    modifier = Modifier.size(28.dp)
                 )
             }
 
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
             Text(
                 text = title,
@@ -171,7 +172,7 @@ fun EmptyStateCard(
                 color = MaterialTheme.colorScheme.onSurface
             )
 
-            Spacer(modifier = Modifier.height(4.dp))
+            Spacer(modifier = Modifier.height(6.dp))
 
             Text(
                 text = message,
@@ -181,12 +182,13 @@ fun EmptyStateCard(
             )
 
             if (actionButtonText != null && onActionClick != null) {
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(14.dp))
                 Button(
                     onClick = onActionClick,
-                    shape = RoundedCornerShape(10.dp)
+                    shape = RoundedCornerShape(12.dp),
+                    contentPadding = PaddingValues(horizontal = 18.dp, vertical = 8.dp)
                 ) {
-                    Text(actionButtonText)
+                    Text(actionButtonText, fontWeight = FontWeight.Bold)
                 }
             }
         }

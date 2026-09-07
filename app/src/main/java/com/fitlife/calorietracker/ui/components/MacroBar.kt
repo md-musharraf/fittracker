@@ -99,15 +99,15 @@ fun MacroItem(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(6.dp)
-                .clip(RoundedCornerShape(3.dp))
+                .height(8.dp)
+                .clip(RoundedCornerShape(4.dp))
                 .background(barColor.copy(alpha = 0.2f))
         ) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth(animatedProgress)
                     .fillMaxHeight()
-                    .clip(RoundedCornerShape(3.dp))
+                    .clip(RoundedCornerShape(4.dp))
                     .background(barColor)
             )
         }

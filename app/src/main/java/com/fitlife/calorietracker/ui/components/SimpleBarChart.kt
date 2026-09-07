@@ -38,11 +38,12 @@ fun SimpleWeeklyBarChart(
     val maxCalories = (weeklyData.maxOfOrNull { it.caloriesConsumed.coerceAtLeast(it.calorieGoal.toDouble()) } ?: 2500.0) * 1.15
 
     Card(
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(18.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.5f)),
         modifier = modifier.fillMaxWidth()
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
+        Column(modifier = Modifier.padding(18.dp)) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -68,13 +69,11 @@ fun SimpleWeeklyBarChart(
                 )
             }
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(18.dp))
 
             // Bars Row
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(140.dp),
+                modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.Bottom
             ) {
@@ -113,34 +112,66 @@ private fun RowScope.WeeklyBarItem(
         modifier = Modifier.weight(1f)
     ) {
         // Calorie text above bar
-        if (item.caloriesConsumed > 0) {
-            Text(
-                text = "${item.caloriesConsumed.roundToInt()}",
-                style = MaterialTheme.typography.labelSmall.copy(fontSize = 9.sp),
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-            Spacer(modifier = Modifier.height(4.dp))
+        Box(
+            modifier = Modifier.height(16.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            if (item.caloriesConsumed > 0) {
+                Text(
+                    text = "${item.caloriesConsumed.roundToInt()}",
+                    style = MaterialTheme.typography.labelSmall.copy(fontSize = 9.sp, fontWeight = FontWeight.Bold),
+                    color = if (item.isToday) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
         }
 
-        // Bar
+        Spacer(modifier = Modifier.height(4.dp))
+
+        // Bar container with background track
         Box(
             modifier = Modifier
                 .width(22.dp)
-                .weight(1f, fill = false)
-                .fillMaxHeight(animatedFraction)
-                .clip(RoundedCornerShape(topStart = 6.dp, topEnd = 6.dp))
-                .background(barColor)
-        )
+                .height(100.dp)
+                .clip(RoundedCornerShape(6.dp))
+                .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
+            contentAlignment = Alignment.BottomCenter
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight(animatedFraction)
+                    .clip(RoundedCornerShape(6.dp))
+                    .background(barColor)
+            )
+        }
 
-        Spacer(modifier = Modifier.height(6.dp))
+        Spacer(modifier = Modifier.height(8.dp))
 
         // Day label
-        Text(
-            text = item.dayLabel,
-            style = MaterialTheme.typography.labelSmall.copy(
-                fontWeight = if (item.isToday) FontWeight.Bold else FontWeight.Normal,
-                color = if (item.isToday) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+        if (item.isToday) {
+            androidx.compose.material3.Surface(
+                shape = RoundedCornerShape(6.dp),
+                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.18f)
+            ) {
+                Text(
+                    text = item.dayLabel,
+                    style = MaterialTheme.typography.labelSmall.copy(
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 10.sp
+                    ),
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp)
+                )
+            }
+        } else {
+            Text(
+                text = item.dayLabel,
+                style = MaterialTheme.typography.labelSmall.copy(
+                    fontWeight = FontWeight.Medium,
+                    fontSize = 11.sp
+                ),
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
-        )
+        }
     }
 }

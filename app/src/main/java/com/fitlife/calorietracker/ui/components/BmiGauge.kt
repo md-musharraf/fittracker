@@ -39,9 +39,12 @@ fun BmiGauge(
         label = "BmiNeedle"
     )
 
+    val needleColor = MaterialTheme.colorScheme.onSurface
+
     Card(
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(18.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.5f)),
         modifier = modifier.fillMaxWidth()
     ) {
         Column(modifier = Modifier.padding(18.dp)) {
@@ -144,7 +147,7 @@ fun BmiGauge(
                     lineTo(needleX + triangleWidth / 2, triangleHeight)
                     close()
                 }
-                drawPath(path, color = Color.White)
+                drawPath(path, color = needleColor)
             }
 
             Spacer(modifier = Modifier.height(10.dp))

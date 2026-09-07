@@ -101,11 +101,30 @@ fun FoodLogScreen(
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 items(categories) { category ->
+                    val isSelected = uiState.selectedCategory == category
                     FilterChip(
-                        selected = uiState.selectedCategory == category,
+                        selected = isSelected,
                         onClick = { viewModel.onCategorySelected(category) },
-                        label = { Text(category, style = MaterialTheme.typography.labelSmall) },
-                        shape = RoundedCornerShape(10.dp)
+                        label = {
+                            Text(
+                                category,
+                                style = MaterialTheme.typography.labelSmall.copy(
+                                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium
+                                )
+                            )
+                        },
+                        colors = FilterChipDefaults.filterChipColors(
+                            selectedContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.18f),
+                            selectedLabelColor = MaterialTheme.colorScheme.primary
+                        ),
+                        border = FilterChipDefaults.filterChipBorder(
+                            enabled = true,
+                            selected = isSelected,
+                            borderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.45f),
+                            selectedBorderColor = MaterialTheme.colorScheme.primary,
+                            borderWidth = 1.dp
+                        ),
+                        shape = RoundedCornerShape(12.dp)
                     )
                 }
             }
@@ -218,8 +237,9 @@ fun FoodCardItem(
     onToggleFavorite: () -> Unit
 ) {
     Card(
-        shape = RoundedCornerShape(14.dp),
+        shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.5f)),
         modifier = Modifier
             .fillMaxWidth()
             .clickable { onFoodClick() }

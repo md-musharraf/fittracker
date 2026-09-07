@@ -96,11 +96,12 @@ fun WaterTrackerWidget(
     }
 
     Card(
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(18.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.5f)),
         modifier = modifier.fillMaxWidth()
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
+        Column(modifier = Modifier.padding(18.dp)) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -109,7 +110,7 @@ fun WaterTrackerWidget(
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Box(
                         modifier = Modifier
-                            .size(36.dp)
+                            .size(38.dp)
                             .clip(CircleShape)
                             .background(WaterColor.copy(alpha = 0.15f)),
                         contentAlignment = Alignment.Center
@@ -147,28 +148,24 @@ fun WaterTrackerWidget(
 
             Spacer(modifier = Modifier.height(14.dp))
 
-            // Progress Bar
-            val surfaceVariant = MaterialTheme.colorScheme.surfaceVariant
+            // Capsule Progress Bar
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(10.dp)
-                    .clip(RoundedCornerShape(6.dp))
-                    .drawBehind {
-                        drawRect(color = surfaceVariant)
-                        if (animatedProgress > 0f) {
-                            drawRect(
-                                color = WaterColor,
-                                size = androidx.compose.ui.geometry.Size(
-                                    width = size.width * animatedProgress,
-                                    height = size.height
-                                )
-                            )
-                        }
-                    }
-            )
+                    .clip(RoundedCornerShape(5.dp))
+                    .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f))
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth(animatedProgress)
+                        .fillMaxHeight()
+                        .clip(RoundedCornerShape(5.dp))
+                        .background(WaterColor)
+                )
+            }
 
-            Spacer(modifier = Modifier.height(14.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
             // Quick Add & Adjust Buttons
             Row(
@@ -179,47 +176,47 @@ fun WaterTrackerWidget(
                     OutlinedButton(
                         onClick = { onSubtractWater(250) },
                         enabled = currentMl > 0,
-                        shape = RoundedCornerShape(10.dp),
+                        shape = RoundedCornerShape(12.dp),
                         contentPadding = PaddingValues(horizontal = 6.dp, vertical = 6.dp),
                         modifier = Modifier.weight(0.9f)
                     ) {
                         Icon(imageVector = Icons.Default.Remove, contentDescription = null, modifier = Modifier.size(13.dp))
                         Spacer(modifier = Modifier.width(2.dp))
-                        Text(text = "250ml", fontSize = 11.sp)
+                        Text(text = "250ml", fontSize = 11.sp, fontWeight = FontWeight.SemiBold)
                     }
                 }
 
                 OutlinedButton(
                     onClick = { onAddWater(250) },
-                    shape = RoundedCornerShape(10.dp),
+                    shape = RoundedCornerShape(12.dp),
                     contentPadding = PaddingValues(horizontal = 6.dp, vertical = 6.dp),
                     modifier = Modifier.weight(1f)
                 ) {
                     Icon(imageVector = Icons.Default.Add, contentDescription = null, modifier = Modifier.size(13.dp))
                     Spacer(modifier = Modifier.width(2.dp))
-                    Text(text = "+250ml", fontSize = 11.sp)
+                    Text(text = "+250ml", fontSize = 11.sp, fontWeight = FontWeight.SemiBold)
                 }
 
                 OutlinedButton(
                     onClick = { onAddWater(500) },
-                    shape = RoundedCornerShape(10.dp),
+                    shape = RoundedCornerShape(12.dp),
                     contentPadding = PaddingValues(horizontal = 6.dp, vertical = 6.dp),
                     modifier = Modifier.weight(1f)
                 ) {
                     Icon(imageVector = Icons.Default.Add, contentDescription = null, modifier = Modifier.size(13.dp))
                     Spacer(modifier = Modifier.width(2.dp))
-                    Text(text = "+500ml", fontSize = 11.sp)
+                    Text(text = "+500ml", fontSize = 11.sp, fontWeight = FontWeight.SemiBold)
                 }
 
                 OutlinedButton(
                     onClick = { showCustomWaterDialog = true },
-                    shape = RoundedCornerShape(10.dp),
+                    shape = RoundedCornerShape(12.dp),
                     contentPadding = PaddingValues(horizontal = 4.dp, vertical = 6.dp),
                     modifier = Modifier.weight(1f)
                 ) {
                     Icon(imageVector = Icons.Default.Edit, contentDescription = null, modifier = Modifier.size(12.dp))
                     Spacer(modifier = Modifier.width(2.dp))
-                    Text(text = "Custom", fontSize = 11.sp)
+                    Text(text = "Custom", fontSize = 11.sp, fontWeight = FontWeight.SemiBold)
                 }
             }
         }

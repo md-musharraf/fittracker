@@ -2,6 +2,7 @@ package com.fitlife.calorietracker.ui.screens.workout
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
@@ -55,6 +56,8 @@ fun AddWorkoutDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
+        shape = RoundedCornerShape(24.dp),
+        containerColor = MaterialTheme.colorScheme.surface,
         title = {
             Text(
                 text = "Log Workout / Activity",
@@ -151,6 +154,7 @@ fun AddWorkoutDialog(
         },
         confirmButton = {
             Button(
+                shape = RoundedCornerShape(12.dp),
                 onClick = {
                     val safeDuration = com.fitlife.calorietracker.data.model.ValidationUtils.safeParseInt(durationMinutesText, default = 0, min = 1, max = 720)
                     if (safeDuration > 0) {
@@ -170,7 +174,7 @@ fun AddWorkoutDialog(
                     }
                 }
             ) {
-                Text("Log Activity")
+                Text("Log Activity", fontWeight = FontWeight.Bold)
             }
         },
         dismissButton = {

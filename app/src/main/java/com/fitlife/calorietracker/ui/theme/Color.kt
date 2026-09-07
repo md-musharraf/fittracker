@@ -23,13 +23,19 @@ val WorkoutColor = Color(0xFFA855F7) // Purple / Gym energy
 val DarkBackground = Color(0xFF0B0F17)
 val DarkSurface = Color(0xFF131B2A)
 val DarkSurfaceElevated = Color(0xFF1E293B)
-val DarkSurfaceBorder = Color(0xFF334155)
+val DarkSurfaceBorder = Color(0xFF26354A)
+val DarkCardBorder = Color(0xFF1E2D42)
+val DarkPrimaryContainer = Color(0xFF331604)
+val DarkAccentContainer = Color(0xFF06331D)
 
 // Light Theme Surfaces
 val LightBackground = Color(0xFFF8FAFC)
 val LightSurface = Color(0xFFFFFFFF)
 val LightSurfaceElevated = Color(0xFFF1F5F9)
 val LightSurfaceBorder = Color(0xFFE2E8F0)
+val LightCardBorder = Color(0xFFE2E8F0)
+val LightPrimaryContainer = Color(0xFFFFEDD5)
+val LightAccentContainer = Color(0xFFDCFCE7)
 
 // Text Colors
 val TextPrimaryDark = Color(0xFFF8FAFC)

@@ -142,8 +142,9 @@ fun DashboardScreen(
             // Date Switcher Row
             item(key = "date_switcher", contentType = "date_switcher") {
                 Card(
-                    shape = RoundedCornerShape(14.dp),
+                    shape = RoundedCornerShape(16.dp),
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                    border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.5f)),
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Row(
@@ -193,10 +194,11 @@ fun DashboardScreen(
             if (uiState.dailyTip.isNotEmpty()) {
                 item(key = "daily_tip", contentType = "tip") {
                     Card(
-                        shape = RoundedCornerShape(14.dp),
+                        shape = RoundedCornerShape(16.dp),
                         colors = CardDefaults.cardColors(
                             containerColor = PrimaryOrange.copy(alpha = 0.1f)
                         ),
+                        border = androidx.compose.foundation.BorderStroke(1.dp, PrimaryOrange.copy(alpha = 0.35f)),
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Row(
@@ -223,6 +225,7 @@ fun DashboardScreen(
                 Card(
                     shape = RoundedCornerShape(20.dp),
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                    border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.5f)),
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Column(
@@ -359,15 +362,16 @@ fun DashboardScreen(
                                 )
                                 splitItems.forEach { (name, pct, color) ->
                                     Card(
-                                        shape = RoundedCornerShape(8.dp),
+                                        shape = RoundedCornerShape(10.dp),
                                         colors = CardDefaults.cardColors(containerColor = color.copy(alpha = 0.12f)),
+                                        border = androidx.compose.foundation.BorderStroke(1.dp, color.copy(alpha = 0.3f)),
                                         modifier = Modifier.weight(1f)
                                     ) {
                                         Column(
                                             modifier = Modifier.padding(vertical = 6.dp, horizontal = 4.dp),
                                             horizontalAlignment = Alignment.CenterHorizontally
                                         ) {
-                                            Text(name, style = MaterialTheme.typography.labelSmall, color = color, maxLines = 1)
+                                            Text(name, style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.SemiBold), color = color, maxLines = 1)
                                             Text(
                                                 "$pct%",
                                                 style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
@@ -385,8 +389,9 @@ fun DashboardScreen(
             // Workouts Activity Quick Card
             item(key = "workouts_card", contentType = "workouts_card") {
                 Card(
-                    shape = RoundedCornerShape(16.dp),
+                    shape = RoundedCornerShape(18.dp),
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                    border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.5f)),
                     modifier = Modifier
                         .fillMaxWidth()
                         .clickable { onNavigateToWorkouts() }
@@ -394,7 +399,7 @@ fun DashboardScreen(
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(16.dp),
+                            .padding(18.dp),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {

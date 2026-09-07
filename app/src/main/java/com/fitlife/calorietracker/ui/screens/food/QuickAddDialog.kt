@@ -3,6 +3,7 @@ package com.fitlife.calorietracker.ui.screens.food
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -52,6 +53,8 @@ fun QuickAddDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
+        shape = RoundedCornerShape(24.dp),
+        containerColor = MaterialTheme.colorScheme.surface,
         title = {
             Text(
                 text = "Quick Calorie Add",
@@ -141,9 +144,10 @@ fun QuickAddDialog(
                         val f = com.fitlife.calorietracker.data.model.ValidationUtils.safeParseDouble(fatText, default = 0.0, min = 0.0, max = 1_000.0)
                         onConfirm(name, calories, p, c, f, selectedMealType)
                     }
-                }
+                },
+                shape = RoundedCornerShape(12.dp)
             ) {
-                Text("Log to ${selectedMealType.displayName}")
+                Text("Log to ${selectedMealType.displayName}", fontWeight = FontWeight.Bold)
             }
         },
         dismissButton = {

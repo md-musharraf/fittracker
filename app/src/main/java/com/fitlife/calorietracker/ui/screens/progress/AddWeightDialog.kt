@@ -1,6 +1,7 @@
 package com.fitlife.calorietracker.ui.screens.progress
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -25,6 +26,8 @@ fun AddWeightDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
+        shape = RoundedCornerShape(24.dp),
+        containerColor = MaterialTheme.colorScheme.surface,
         title = {
             Text(
                 text = "Log Body Weight",
@@ -67,9 +70,10 @@ fun AddWeightDialog(
                     if (weight >= 20.0) {
                         onConfirm(weight, notes.trim().take(120))
                     }
-                }
+                },
+                shape = RoundedCornerShape(12.dp)
             ) {
-                Text("Save Weight")
+                Text("Save Weight", fontWeight = FontWeight.Bold)
             }
         },
         dismissButton = {
