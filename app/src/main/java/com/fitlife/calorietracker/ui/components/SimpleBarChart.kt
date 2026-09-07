@@ -120,7 +120,9 @@ private fun RowScope.WeeklyBarItem(
                 Text(
                     text = "${item.caloriesConsumed.roundToInt()}",
                     style = MaterialTheme.typography.labelSmall.copy(fontSize = 9.sp, fontWeight = FontWeight.Bold),
-                    color = if (item.isToday) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+                    color = if (item.isToday) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 1,
+                    softWrap = false
                 )
             }
         }
@@ -160,7 +162,9 @@ private fun RowScope.WeeklyBarItem(
                         fontSize = 10.sp
                     ),
                     color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp)
+                    modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp),
+                    maxLines = 1,
+                    softWrap = false
                 )
             }
         } else {
@@ -170,7 +174,9 @@ private fun RowScope.WeeklyBarItem(
                     fontWeight = FontWeight.Medium,
                     fontSize = 11.sp
                 ),
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                maxLines = 1,
+                softWrap = false
             )
         }
     }

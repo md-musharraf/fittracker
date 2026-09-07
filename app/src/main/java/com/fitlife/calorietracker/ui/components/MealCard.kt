@@ -18,6 +18,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.fitlife.calorietracker.data.model.MealLog
@@ -93,7 +94,10 @@ fun MealCard(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
+                Row(
+                    modifier = Modifier.weight(1f),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
                     Box(
                         modifier = Modifier
                             .size(38.dp)
@@ -111,33 +115,42 @@ fun MealCard(
 
                     Spacer(modifier = Modifier.width(12.dp))
 
-                    Column {
+                    Column(modifier = Modifier.weight(1f, fill = false)) {
                         Text(
                             text = mealType.displayName,
                             style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-                            color = MaterialTheme.colorScheme.onSurface
+                            color = MaterialTheme.colorScheme.onSurface,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
                         )
                         if (items.isNotEmpty()) {
                             Text(
                                 text = "P: ${totalProtein.roundToInt()}g  •  C: ${totalCarbs.roundToInt()}g  •  F: ${totalFat.roundToInt()}g",
                                 style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
                             )
                         } else {
                             Text(
                                 text = "No food logged yet",
                                 style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                maxLines = 1
                             )
                         }
                     }
                 }
 
+                Spacer(modifier = Modifier.width(8.dp))
+
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
                         text = "${totalCalories.roundToInt()} kcal",
                         style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold),
-                        color = MaterialTheme.colorScheme.primary
+                        color = MaterialTheme.colorScheme.primary,
+                        maxLines = 1,
+                        softWrap = false
                     )
 
                     if (items.isNotEmpty() || onCopyYesterdayClick != null) {
@@ -247,23 +260,24 @@ fun MealCard(
                         Button(
                             onClick = onAddFoodClick,
                             shape = RoundedCornerShape(12.dp),
-                            contentPadding = PaddingValues(horizontal = 14.dp, vertical = 8.dp),
+                            contentPadding = PaddingValues(horizontal = 10.dp, vertical = 8.dp),
                             modifier = Modifier.weight(1f)
                         ) {
                             Icon(imageVector = Icons.Default.Add, contentDescription = null, modifier = Modifier.size(16.dp))
-                            Spacer(modifier = Modifier.width(6.dp))
-                            Text(text = "Add Food", fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(text = "Add Food", fontSize = 13.sp, fontWeight = FontWeight.Bold, maxLines = 1, softWrap = false)
                         }
 
                         OutlinedButton(
                             onClick = onQuickAddClick,
                             shape = RoundedCornerShape(12.dp),
                             border = androidx.compose.foundation.BorderStroke(1.dp, PrimaryOrange.copy(alpha = 0.6f)),
-                            contentPadding = PaddingValues(horizontal = 14.dp, vertical = 8.dp)
+                            contentPadding = PaddingValues(horizontal = 10.dp, vertical = 8.dp),
+                            modifier = Modifier.weight(1f)
                         ) {
                             Icon(imageVector = Icons.Default.FlashOn, contentDescription = null, modifier = Modifier.size(16.dp), tint = PrimaryOrange)
                             Spacer(modifier = Modifier.width(4.dp))
-                            Text(text = "Quick Add", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = PrimaryOrange)
+                            Text(text = "Quick Add", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = PrimaryOrange, maxLines = 1, softWrap = false)
                         }
                     }
                 }
@@ -292,19 +306,24 @@ fun MealItemRow(
                 Text(
                     text = item.foodName,
                     style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold),
-                    color = MaterialTheme.colorScheme.onSurface
+                    color = MaterialTheme.colorScheme.onSurface,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(1f, fill = false)
                 )
                 if (item.servingCount != 1.0) {
                     Spacer(modifier = Modifier.width(6.dp))
                     Badge(containerColor = MaterialTheme.colorScheme.surfaceVariant) {
-                        Text("${item.servingCount}x", fontSize = 10.sp)
+                        Text("${item.servingCount}x", fontSize = 10.sp, maxLines = 1)
                     }
                 }
             }
             Text(
                 text = "${item.calories.roundToInt()} kcal  •  ${item.proteinGrams.roundToInt()}g P  ${item.carbsGrams.roundToInt()}g C  ${item.fatGrams.roundToInt()}g F",
                 style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
             )
         }
 

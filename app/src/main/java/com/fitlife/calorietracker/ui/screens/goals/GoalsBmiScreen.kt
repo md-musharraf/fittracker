@@ -16,6 +16,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.fitlife.calorietracker.data.model.*
@@ -109,41 +111,40 @@ fun GoalsBmiScreen(
                         )
                         Spacer(modifier = Modifier.height(14.dp))
 
-                        // Gender Chips & Age
+                        // Gender Chips
                         Row(
                             modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
-                            verticalAlignment = Alignment.CenterVertically
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
                             FilterChip(
                                 selected = gender == "Male",
                                 onClick = { gender = "Male" },
-                                label = { Text("Male") },
+                                label = { Text("Male", modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center) },
                                 modifier = Modifier.weight(1f)
                             )
                             FilterChip(
                                 selected = gender == "Female",
                                 onClick = { gender = "Female" },
-                                label = { Text("Female") },
-                                modifier = Modifier.weight(1f)
-                            )
-                            OutlinedTextField(
-                                value = ageText,
-                                onValueChange = { ageText = it },
-                                label = { Text("Age") },
-                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                                singleLine = true,
+                                label = { Text("Female", modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center) },
                                 modifier = Modifier.weight(1f)
                             )
                         }
 
                         Spacer(modifier = Modifier.height(10.dp))
 
-                        // Height & Weight Inputs
+                        // Age & Height Inputs
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
+                            OutlinedTextField(
+                                value = ageText,
+                                onValueChange = { ageText = it },
+                                label = { Text("Age (Years)") },
+                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                                singleLine = true,
+                                modifier = Modifier.weight(1f)
+                            )
                             OutlinedTextField(
                                 value = heightText,
                                 onValueChange = { heightText = it },
@@ -152,26 +153,32 @@ fun GoalsBmiScreen(
                                 singleLine = true,
                                 modifier = Modifier.weight(1f)
                             )
+                        }
+
+                        Spacer(modifier = Modifier.height(10.dp))
+
+                        // Current Weight & Target Weight Inputs
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
                             OutlinedTextField(
                                 value = weightText,
                                 onValueChange = { weightText = it },
-                                label = { Text("Weight (kg)") },
+                                label = { Text("Current Weight (kg)") },
+                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                                singleLine = true,
+                                modifier = Modifier.weight(1f)
+                            )
+                            OutlinedTextField(
+                                value = targetWeightText,
+                                onValueChange = { targetWeightText = it },
+                                label = { Text("Goal Weight (kg)") },
                                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                                 singleLine = true,
                                 modifier = Modifier.weight(1f)
                             )
                         }
-
-                        Spacer(modifier = Modifier.height(10.dp))
-
-                        OutlinedTextField(
-                            value = targetWeightText,
-                            onValueChange = { targetWeightText = it },
-                            label = { Text("Target Goal Weight (kg)") },
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                            singleLine = true,
-                            modifier = Modifier.fillMaxWidth()
-                        )
 
                         Spacer(modifier = Modifier.height(14.dp))
 
@@ -263,7 +270,7 @@ fun GoalsBmiScreen(
                                         onClick = { selectedPersona = persona }
                                     )
                                     Spacer(modifier = Modifier.width(10.dp))
-                                    Column {
+                                    Column(modifier = Modifier.weight(1f)) {
                                         Text(
                                             text = persona.title,
                                             style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
@@ -421,6 +428,14 @@ fun GoalsBmiScreen(
                                 singleLine = true,
                                 modifier = Modifier.weight(1f)
                             )
+                        }
+
+                        Spacer(modifier = Modifier.height(10.dp))
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
                             OutlinedTextField(
                                 value = fatGoalText,
                                 onValueChange = { fatGoalText = it },
@@ -429,18 +444,15 @@ fun GoalsBmiScreen(
                                 singleLine = true,
                                 modifier = Modifier.weight(1f)
                             )
+                            OutlinedTextField(
+                                value = waterGoalText,
+                                onValueChange = { waterGoalText = it },
+                                label = { Text("Water (ml)") },
+                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                                singleLine = true,
+                                modifier = Modifier.weight(1f)
+                            )
                         }
-
-                        Spacer(modifier = Modifier.height(10.dp))
-
-                        OutlinedTextField(
-                            value = waterGoalText,
-                            onValueChange = { waterGoalText = it },
-                            label = { Text("Daily Water Hydration Goal (ml)") },
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                            singleLine = true,
-                            modifier = Modifier.fillMaxWidth()
-                        )
                     }
                 }
             }

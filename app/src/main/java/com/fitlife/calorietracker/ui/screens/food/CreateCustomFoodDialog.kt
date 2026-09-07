@@ -122,6 +122,12 @@ fun CreateCustomFoodDialog(
                         singleLine = true,
                         modifier = Modifier.weight(1f)
                     )
+                }
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
                     OutlinedTextField(
                         value = fatText,
                         onValueChange = { 
@@ -133,16 +139,15 @@ fun CreateCustomFoodDialog(
                         singleLine = true,
                         modifier = Modifier.weight(1f)
                     )
+                    OutlinedTextField(
+                        value = fiberText,
+                        onValueChange = { fiberText = it },
+                        label = { Text("Fiber (g)") },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                        singleLine = true,
+                        modifier = Modifier.weight(1f)
+                    )
                 }
-
-                OutlinedTextField(
-                    value = fiberText,
-                    onValueChange = { fiberText = it },
-                    label = { Text("Fiber (g) (Optional)") },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth()
-                )
             }
         },
         confirmButton = {

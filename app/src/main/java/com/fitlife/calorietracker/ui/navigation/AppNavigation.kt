@@ -29,6 +29,7 @@ import com.fitlife.calorietracker.ui.screens.workout.WorkoutScreen
 import com.fitlife.calorietracker.ui.screens.workout.WorkoutViewModel
 import com.fitlife.calorietracker.ui.theme.PrimaryOrange
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 
 sealed class Screen(val route: String, val title: String, val icon: ImageVector) {
@@ -37,7 +38,7 @@ sealed class Screen(val route: String, val title: String, val icon: ImageVector)
         fun createRoute(mealType: String = MealType.BREAKFAST.name) = "food_log?mealType=$mealType"
     }
     object Workouts : Screen("workouts", "Workouts", Icons.Default.FitnessCenter)
-    object Goals : Screen("goals", "Goals & BMI", Icons.Default.Calculate)
+    object Goals : Screen("goals", "Goals", Icons.Default.Calculate)
     object Progress : Screen("progress", "Progress", Icons.Default.ShowChart)
 }
 
@@ -94,6 +95,9 @@ fun MainAppScaffold(
                         label = {
                             Text(
                                 screen.title,
+                                maxLines = 1,
+                                softWrap = false,
+                                overflow = TextOverflow.Ellipsis,
                                 style = MaterialTheme.typography.labelSmall.copy(
                                     fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium
                                 )
